@@ -8,22 +8,18 @@ const TestFlow = () => {
   });
 
   const handleTestClick = (test) => {
-    if (test === "loginTest") {
-      setTestStatus((prevStatus) => ({
-        ...prevStatus,
-        loginTest: "passed",
-      }));
-    } else if (test === "registrationTest") {
-      setTestStatus((prevStatus) => ({
-        ...prevStatus,
-        registrationTest: "failed",
-      }));
-    } else if (test === "profileTest" && testStatus.registrationTest !== "failed") {
-      setTestStatus((prevStatus) => ({
-        ...prevStatus,
-        profileTest: "passed",
-      }));
-    }
+    setTestStatus((prevStatus) => {
+      if (test === "loginTest") {
+        return { ...prevStatus, loginTest: "passed" };
+      }
+      if (test === "registrationTest") {
+        return { ...prevStatus, registrationTest: "failed" };
+      }
+      if (test === "profileTest" && prevStatus.registrationTest !== "failed") {
+        return { ...prevStatus, profileTest: "passed" };
+      }
+      return prevStatus;
+    });
   };
 
   const resetTests = () => {
@@ -38,25 +34,16 @@ const TestFlow = () => {
     <div style={styles.container}>
       <h3 style={styles.header}>Test Flow: Login → Registration → Profile</h3>
       <div style={styles.testSequence}>
-        {["loginTest", "registrationTest", "profileTest"].map((test, index) => (
+        {["loginTest", "registrationTest", "profileTest"].map((test) => (
           <div
             key={test}
             style={{
               ...styles.testStep,
-              backgroundColor:
-                testStatus[test] === "pending"
-                  ? "#dcdcdc"
-                  : testStatus[test] === "passed"
-                  ? "#28a745"
-                  : "#dc3545",
+              backgroundColor: getBackgroundColor(testStatus[test]),
             }}
             onClick={() => handleTestClick(test)}
           >
-            {test === "loginTest"
-              ? "Login Test"
-              : test === "registrationTest"
-              ? "Registration Test"
-              : "Profile Test"}
+            {getTestLabel(test)}
           </div>
         ))}
       </div>
@@ -67,15 +54,47 @@ const TestFlow = () => {
   );
 };
 
+const getTestLabel = (test) => {
+  switch (test) {
+    case "loginTest":
+      return "Login Test";
+    case "registrationTest":
+      return "Registration Test";
+    case "profileTest":
+      return "Profile Test";
+    default:
+      return "Test";
+  }
+};
+
+const getBackgroundColor = (status) => {
+  switch (status) {
+    case "pending":
+      return "#dcdcdc";
+    case "passed":
+      return "#28a745";
+    case "failed":
+      return "#dc3545";
+    default:
+      return "#dcdcdc";
+  }
+};
+
 const styles = {
   container: {
     width: "300px",
+    height: "400px",
     padding: "10px",
+    margin: "0 auto",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
     backgroundColor: "#f9f9f9",
     borderRadius: "8px",
     boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
-    textAlign: "center",
     fontFamily: "'Arial', sans-serif",
+    textAlign: "center",
   },
   header: {
     fontSize: "1.2rem",
@@ -85,9 +104,11 @@ const styles = {
   testSequence: {
     display: "flex",
     flexDirection: "column",
+    alignItems: "center",
     marginBottom: "15px",
   },
   testStep: {
+    width: "200%",
     padding: "10px",
     margin: "5px 0",
     borderRadius: "4px",
@@ -95,7 +116,8 @@ const styles = {
     color: "#fff",
     cursor: "pointer",
     fontWeight: "bold",
-    transition: "background-color 0.3s",
+    textAlign: "center",
+    transition: "background-color 0.3s ease",
   },
   resetButton: {
     padding: "8px 15px",
@@ -105,7 +127,7 @@ const styles = {
     borderRadius: "4px",
     cursor: "pointer",
     fontSize: "0.9rem",
-    transition: "background-color 0.3s",
+    transition: "background-color 0.3s ease",
   },
 };
 
